@@ -52,11 +52,7 @@ export function MatchCard({ match, onStatusChange }: MatchCardProps) {
   ];
   const displayReasons =
     match.matched_attributes && match.matched_attributes.length > 0
-<<<<<<< HEAD
       ? match.matched_attributes.map((label) => ({ label, pass: true }))
-=======
-      ? match.matched_attributes.map((label: string) => ({ label, pass: true }))
->>>>>>> main2
       : reasons;
 
   return (
@@ -89,11 +85,7 @@ export function MatchCard({ match, onStatusChange }: MatchCardProps) {
       <div className="mt-4 rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/60">
         <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Matching attributes</p>
         <ul className="mt-2 space-y-1.5 text-sm text-zinc-600 dark:text-zinc-300">
-<<<<<<< HEAD
           {displayReasons.map((reason) => (
-=======
-          {displayReasons.map((reason: { label: string; pass: boolean }) => (
->>>>>>> main2
             <li key={reason.label} className="flex items-center gap-2">
               <span className={reason.pass ? "text-emerald-600" : "text-zinc-400"}>{reason.pass ? "✔" : "•"}</span>
               {reason.label}

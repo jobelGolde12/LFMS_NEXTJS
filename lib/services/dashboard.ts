@@ -48,10 +48,11 @@ export async function getReportTrend(days: number = 90): Promise<ReportTrendPoin
 
   const counts = new Map<string, { lost: number; found: number }>();
   for (const row of rows.rows) {
-    const date = String((row as { date: string }).date);
+    const typedRow = row as unknown as { date: string; lost: number; found: number };
+    const date = String(typedRow.date);
     counts.set(date, {
-      lost: Number((row as { lost: number }).lost || 0),
-      found: Number((row as { found: number }).found || 0),
+      lost: Number(typedRow.lost || 0),
+      found: Number(typedRow.found || 0),
     });
   }
 
