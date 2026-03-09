@@ -37,7 +37,11 @@ export async function POST(request: NextRequest) {
     });
 
     await runMatchingForItem(item).catch((error) => {
+<<<<<<< HEAD
       console.error("Post-create matching error:", error);
+=======
+      console.error("Matching trigger error:", error);
+>>>>>>> main2
     });
 
     return NextResponse.json({ message: "Item created successfully", item });
