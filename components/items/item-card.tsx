@@ -17,14 +17,17 @@ export function ItemCard({ item, showActions = false, showClaimButton = false }:
   const isLost = item.status === "lost";
 
   return (
-    <Card hover className="h-full">
-      <div className="relative h-48 bg-zinc-100 dark:bg-zinc-800">
+    <Card
+      hover
+      className="group h-full overflow-hidden rounded-3xl border border-zinc-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
+    >
+      <div className="relative h-52 bg-zinc-100 dark:bg-zinc-800">
         {item.image_url ? (
           <Image
             src={item.image_url}
             alt={item.title}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="flex items-center justify-center h-full">
@@ -43,22 +46,28 @@ export function ItemCard({ item, showActions = false, showClaimButton = false }:
             </svg>
           </div>
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-transparent" />
         <div className="absolute top-3 right-3">
           <Badge variant={isLost ? "danger" : "success"}>
             {isLost ? "Lost" : "Found"}
           </Badge>
         </div>
+        <div className="absolute bottom-3 left-3">
+          <span className="inline-flex items-center rounded-full border border-white/50 bg-white/80 px-2.5 py-1 text-xs font-medium text-zinc-700 backdrop-blur-sm dark:border-zinc-700/60 dark:bg-zinc-900/70 dark:text-zinc-200">
+            {item.category}
+          </span>
+        </div>
       </div>
 
-      <CardContent className="p-4">
-        <h3 className="font-semibold text-lg text-zinc-900 dark:text-white mb-2 line-clamp-1">
+      <CardContent className="p-5">
+        <h3 className="mb-3 line-clamp-1 text-lg font-semibold text-zinc-900 dark:text-white">
           {item.title}
         </h3>
 
-        <div className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
-          <div className="flex items-center space-x-2">
+        <div className="space-y-2.5 text-sm text-zinc-600 dark:text-zinc-400">
+          <div className="flex items-center gap-2">
             <svg
-              className="w-4 h-4"
+              className="h-4 w-4 text-zinc-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -70,45 +79,12 @@ export function ItemCard({ item, showActions = false, showClaimButton = false }:
                 d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
               />
             </svg>
-            <span>{item.category}</span>
+            <span className="line-clamp-1">{item.location}</span>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-            <span>{item.location}</span>
-          </div>
-
-          {item.color && (
-            <div className="flex items-center space-x-2">
-              <div
-                className="w-4 h-4 rounded-full border border-zinc-300"
-                style={{ backgroundColor: item.color.toLowerCase() }}
-              />
-              <span>{item.color}</span>
-            </div>
-          )}
-
-          <div className="flex items-center space-x-2">
-            <svg
-              className="w-4 h-4"
+              className="h-4 w-4 text-zinc-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -122,21 +98,30 @@ export function ItemCard({ item, showActions = false, showClaimButton = false }:
             </svg>
             <span>{formatDate(item.date_reported)}</span>
           </div>
-          {item.reporter_name && (
-            <div className="flex items-center space-x-2">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A9 9 0 1118.879 17.8M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>Reported by {item.reporter_name}</span>
-            </div>
-          )}
+
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            {item.color && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                <span
+                  className="h-2.5 w-2.5 rounded-full border border-zinc-300 dark:border-zinc-600"
+                  style={{ backgroundColor: item.color.toLowerCase() }}
+                />
+                {item.color}
+              </span>
+            )}
+            {item.reporter_name && (
+              <span className="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                {item.reporter_name}
+              </span>
+            )}
+          </div>
         </div>
 
         {showActions && (
-          <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+          <div className="mt-5 border-t border-zinc-100 pt-4 dark:border-zinc-800">
             <Link
               href={`/items/${item.id}`}
-              className="block w-full text-center py-2 px-4 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30 transition-colors font-medium"
+              className="inline-flex w-full items-center justify-center rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
               View Details
             </Link>

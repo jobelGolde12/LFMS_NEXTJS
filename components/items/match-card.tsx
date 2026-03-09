@@ -50,6 +50,10 @@ export function MatchCard({ match, onStatusChange }: MatchCardProps) {
         match.lost_item.brand.toLowerCase() === match.found_item.brand.toLowerCase(),
     },
   ];
+  const displayReasons =
+    match.matched_attributes && match.matched_attributes.length > 0
+      ? match.matched_attributes.map((label) => ({ label, pass: true }))
+      : reasons;
 
   return (
     <Card className="rounded-2xl border border-zinc-200 p-5 shadow-sm dark:border-zinc-800">
@@ -81,7 +85,7 @@ export function MatchCard({ match, onStatusChange }: MatchCardProps) {
       <div className="mt-4 rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/60">
         <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">Matching attributes</p>
         <ul className="mt-2 space-y-1.5 text-sm text-zinc-600 dark:text-zinc-300">
-          {reasons.map((reason) => (
+          {displayReasons.map((reason) => (
             <li key={reason.label} className="flex items-center gap-2">
               <span className={reason.pass ? "text-emerald-600" : "text-zinc-400"}>{reason.pass ? "✔" : "•"}</span>
               {reason.label}

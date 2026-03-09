@@ -37,6 +37,7 @@ export interface ItemMatch {
   created_at: string;
   lost_item?: Item;
   found_item?: Item;
+  matched_attributes?: string[];
 }
 
 export interface ItemClaim {
@@ -92,11 +93,18 @@ export interface LoginInput {
 
 export interface MatchScore {
   score: number;
+  titleSimilarity: number;
+  descriptionSimilarity: number;
+  locationSimilarity: number;
+  dateDiffDays: number;
   category: boolean;
+  title: boolean;
   location: boolean;
+  locationPartial: boolean;
   color: boolean;
   brand: boolean;
   date: boolean;
+  matchedAttributes: string[];
 }
 
 export const CATEGORIES = [

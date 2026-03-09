@@ -1,88 +1,124 @@
 # Matching Algorithm
 
-## Overview
+This project uses a weighted similarity-based matching engine to compare `lost` and `found` items and store realistic match suggestions.
 
-The matching engine is a rule-based system that automatically compares lost and found items to identify potential matches based on multiple attributes.
+## Location
 
-## Scoring System
+Engine module:
 
-Each attribute comparison contributes to a match score:
+- `lib/matching-engine/index.ts`
 
-| Attribute | Weight | Criteria |
-|-----------|--------|----------|
-| Category | 40 points | Exact match (case-insensitive) |
-| Location | 30 points | Exact match (case-insensitive) |
-| Color | 15 points | Exact match (case-insensitive) |
-| Brand | 10 points | Exact match (case-insensitive) |
-| Date | 5 points | Within 7 days of each other |
+## Data Compared
 
-**Maximum Score:** 100 points
-**Match Threshold:** 60 points
+The algorithm compares these fields from `items`:
 
-## Algorithm
+- `title`
+- `category`
+- `brand`
+- `color`
+- `description`
+- `location`
+- `date_reported`
 
-```
-for each lost_item in items:
-    for each found_item in items:
-        score = 0
-        
-        if lost_item.category == found_item.category:
-            score += 40
-            
-        if lost_item.location == found_item.location:
-            score += 30
-            
-        if lost_item.color == found_item.color:
-            score += 15
-            
-        if lost_item.brand == found_item.brand:
-            score += 10
-            
-        date_diff = abs(lost_item.date - found_item.date)
-        if date_diff <= 7 days:
-            score += 5
-            
-        if score >= 60:
-            create_match(lost_item, found_item, score)
-```
+Only cross-status pairs are compared:
 
-## Match Status
+- `lost` ↔ `found`
 
-Matches can have one of three statuses:
+## Scoring Model
 
-1. **suggested** - Automatically generated, awaiting review
-2. **confirmed** - Approved as a valid match
-3. **rejected** - Denied as not matching
+Threshold:
 
-## Implementation
+- `score >= 60` => valid match
+- `score < 60` => ignored
 
-The matching engine is implemented in `/lib/matching-engine/index.ts`:
+Scores are capped at `100`.
 
-- `calculateMatchScore()` - Computes score between two items
-- `runMatchingEngine()` - Runs the matching algorithm
-- `getMatches()` - Retrieves matches with filtering
-- `updateMatchStatus()` - Updates match status
+### Weights
 
-## Usage
+- Category exact match: `+30`
+- Title similarity >= 70%: `+20`
+- Brand exact match: `+15`
+- Color same/similar: `+10`
+- Description keyword overlap: `+15`
+- Location exact match: `+20`
+- Location partial similarity: `+10`
+- Date proximity:
+  - <= 3 days: `+10`
+  - <= 7 days: `+5`
 
-### Running the Matching Engine
+## Similarity Techniques
 
-```typescript
-import { runMatchingEngine } from "@/lib/matching-engine";
+### Title similarity
 
-const matches = await runMatchingEngine();
-```
+- Uses bigram-based string similarity.
+- Considered a match if similarity is at least `0.70`.
 
-### API Endpoint
+### Description similarity
 
-```bash
-POST /api/matches/run
-# Requires admin authentication
-```
+- Normalizes text and tokenizes keywords.
+- Removes stop-words.
+- Uses keyword overlap (Jaccard + common token count).
+- Awards points when overlap is meaningful.
+
+### Color similarity
+
+- Supports canonical color groups (e.g., `dark blue` -> `blue`, `charcoal` -> `black`).
+
+### Location similarity
+
+- Exact normalized string match: full points.
+- Otherwise checks partial similarity using bigram/Jaccard methods.
+
+### Date proximity
+
+- Absolute day difference between report dates.
+
+## Duplicate Prevention
+
+Before insert, engine checks existing pair:
+
+- `lost_item_id`
+- `found_item_id`
+
+If the pair exists:
+
+- skip insert
+- update score only when existing status is `suggested`
+
+Database uniqueness also exists on `(lost_item_id, found_item_id)`.
+
+## Automatic Triggering
+
+Matching is triggered automatically when new items are reported:
+
+- `POST /api/items`
+- `POST /api/items/report-lost`
+- `POST /api/items/report-found`
+
+The trigger uses incremental matching (`runMatchingForItem`) against opposite-status candidates.
+
+## Full Rebuild
+
+Admin can run full matching via existing matching endpoint flow (`runMatchingEngine`) to evaluate all lost-found pairs.
+
+## Match Explanation
+
+Each match includes `matched_attributes` for UI display (e.g.,
+`Same category`, `Similar item title`, `Same brand`, `Same location`, `Reported within 7 days`).
 
 ## Performance Considerations
 
-- Algorithm runs on all lost/found item pairs
-- Consider running during off-peak hours for large datasets
-- Indexes on status field improve retrieval performance
-- Consider caching results for frequently accessed matches
+- Incremental matching uses candidate filtering for opposite items by:
+  - same category, or
+  - same location, or
+  - report date within 30 days
+- SQL indexes used by the schema (`status`, `category`, `location`, etc.) help query speed.
+- Full matrix matching is available for backfill/recompute workflows.
+
+## Logging
+
+Engine logs comparison and storage events for debugging:
+
+- item pair being compared
+- computed score
+- whether stored or skipped
