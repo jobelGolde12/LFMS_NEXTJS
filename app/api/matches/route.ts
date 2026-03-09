@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runMatchingEngine, getMatches, getMatchById, updateMatchStatus } from "@/lib/matching-engine";
-import { getSession, requireAdmin } from "@/lib/utils/session";
+import { runMatchingEngine, getMatches } from "@/lib/matching-engine";
+import { requireAdmin, requireAuth } from "@/lib/auth/permissions";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const session = await requireAdmin();
+    await requireAdmin();
 
     const matches = await runMatchingEngine();
 
@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    await requireAuth();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") || undefined;
     const limit = parseInt(searchParams.get("limit") || "20");

@@ -120,10 +120,10 @@ async function seed() {
   
   await db.execute({
     sql: `INSERT OR IGNORE INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)`,
-    args: [adminId, "Admin User", "admin@ssu.edu.ph", hashedPassword, "admin"],
+    args: [adminId, "System Administrator", "admin@sorsu.edu", hashedPassword, "admin"],
   });
   
-  console.log("✓ Created admin user (admin@ssu.edu.ph / admin123)");
+  console.log("✓ Created admin user (admin@sorsu.edu / admin123)");
   
   // Create regular users
   const users = [];
@@ -256,7 +256,7 @@ async function seed() {
   
   console.log("\n✅ Database seeded successfully!");
   console.log("\nTest accounts:");
-  console.log("  Admin: admin@ssu.edu.ph / admin123");
+  console.log("  Admin: admin@sorsu.edu / admin123");
   console.log("  User: juan.delacruz0@ssu.edu.ph / password123");
 }
 

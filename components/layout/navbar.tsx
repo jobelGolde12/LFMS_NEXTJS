@@ -16,14 +16,22 @@ export function Navbar({ user }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isAuthPage = pathname === "/login" || pathname === "/register";
-  const isDashboard = pathname.startsWith("/dashboard") || pathname.startsWith("/lost-items") || pathname.startsWith("/found-items") || pathname.startsWith("/matches") || pathname.startsWith("/claims") || pathname.startsWith("/report-");
+  const isDashboard =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/dashboard/lost-items") ||
+    pathname.startsWith("/dashboard/found-items") ||
+    pathname.startsWith("/dashboard/matches") ||
+    pathname.startsWith("/claims") ||
+    pathname.startsWith("/dashboard/profile") ||
+    pathname.startsWith("/dashboard/report-");
   const dashboardLinks = [
     { name: "Dashboard", href: "/dashboard" },
-    { name: "Report Lost", href: "/report-lost" },
-    { name: "Report Found", href: "/report-found" },
-    { name: "Lost Items", href: "/lost-items" },
-    { name: "Found Items", href: "/found-items" },
-    { name: "Matches", href: "/matches" },
+    { name: "Report Lost", href: "/dashboard/report-lost" },
+    { name: "Report Found", href: "/dashboard/report-found" },
+    { name: "Lost Items", href: "/dashboard/lost-items" },
+    { name: "Found Items", href: "/dashboard/found-items" },
+    { name: "Matches", href: "/dashboard/matches" },
+    { name: "Profile", href: "/dashboard/profile" },
   ];
 
   const handleLogout = async () => {

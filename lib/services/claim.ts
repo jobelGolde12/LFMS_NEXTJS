@@ -125,3 +125,12 @@ export async function getClaimById(id: string): Promise<ItemClaim | null> {
   if (result.rows.length === 0) return null;
   return result.rows[0] as unknown as ItemClaim;
 }
+
+export async function getClaimCountByStatus(status: ClaimStatus): Promise<number> {
+  const result = await db.execute({
+    sql: "SELECT COUNT(*) as count FROM item_claims WHERE status = ?",
+    args: [status],
+  });
+
+  return Number(result.rows[0]?.count || 0);
+}

@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createItem, getItemsByStatus, getAllItems, getItemById, deleteItem, getItemsByUserId } from "@/lib/services/item";
-import { getSession } from "@/lib/utils/session";
+import { createItem, getItemsByStatus, getAllItems, getItemsByUserId } from "@/lib/services/item";
+import { requireAuth } from "@/lib/auth/permissions";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const session = await requireAuth();
 
     const body = await request.json();
     const { title, category, color, brand, description, location, status, date_reported, image_url } = body;
@@ -50,6 +47,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    await requireAuth();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") as "lost" | "found" | null;
     const search = searchParams.get("search") || undefined;

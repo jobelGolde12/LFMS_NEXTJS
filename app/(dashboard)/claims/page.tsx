@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { getSession, requireAdmin } from "@/lib/utils/session";
+import { getSession } from "@/lib/utils/session";
 import { getAllClaims } from "@/lib/services/claim";
 import { Badge } from "@/components/ui";
 

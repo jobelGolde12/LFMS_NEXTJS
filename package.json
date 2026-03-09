@@ -6,7 +6,8 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "ensure-admin": "node scripts/ensure-admin.mjs"
   },
   "dependencies": {
     "@libsql/client": "^0.17.0",

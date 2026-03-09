@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getItemById, deleteItem, updateItem } from "@/lib/services/item";
-import { getSession } from "@/lib/utils/session";
+import { requireAuth } from "@/lib/auth/permissions";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireAuth();
     const { id } = await params;
     const item = await getItemById(id);
 
@@ -29,10 +30,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const session = await requireAuth();
 
     const { id } = await params;
     const item = await getItemById(id);
@@ -63,10 +61,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const session = await requireAuth();
 
     const { id } = await params;
     const item = await getItemById(id);

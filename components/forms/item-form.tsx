@@ -112,7 +112,7 @@ export function ItemForm({ status }: ItemFormProps) {
       );
 
       setTimeout(() => {
-        router.push(status === "lost" ? "/lost-items" : "/found-items");
+        router.push(status === "lost" ? "/dashboard/lost-items" : "/dashboard/found-items");
         router.refresh();
       }, 1200);
     } catch (err) {

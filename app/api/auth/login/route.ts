@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateUser } from "@/lib/services/user";
+import { setSession } from "@/lib/auth/session";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const email = String(body?.email || "").trim().toLowerCase();
+    const password = String(body?.password || "");
 
     if (!email || !password) {
       return NextResponse.json(
@@ -21,14 +23,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const sessionData = JSON.stringify({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    });
+    await setSession(user);
 
-    const response = NextResponse.json({
+    return NextResponse.json({
       message: "Login successful",
       user: {
         id: user.id,
@@ -38,15 +35,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    response.cookies.set("lfms_session", sessionData, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
-    });
-
-    return response;
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(

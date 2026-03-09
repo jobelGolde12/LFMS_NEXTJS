@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClaim, getAllClaims, getClaimsByUser, updateClaimStatus } from "@/lib/services/claim";
-import { getSession, requireAdmin } from "@/lib/utils/session";
+import { createClaim, getAllClaims, getClaimsByUser } from "@/lib/services/claim";
+import { requireAuth } from "@/lib/auth/permissions";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const session = await requireAuth();
 
     const body = await request.json();
     const { itemId } = body;
@@ -36,10 +33,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const session = await requireAuth();
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status") as "pending" | "approved" | "rejected" || undefined;

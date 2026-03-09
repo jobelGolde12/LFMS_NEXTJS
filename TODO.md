@@ -1,74 +1,274 @@
-You are a senior full-stack developer and UI/UX designer. Your task is to implement dashboard pages for a Lost and Found Management System inside my existing Next.js project.
+You are a senior backend engineer and system security architect.
 
-The project already has:
+Your task is to implement a secure Role-Based Access Control (RBAC) system in my Next.js Lost and Found Management System.
+
+The project already uses:
 
 Next.js (App Router)
 
-Tailwind CSS installed
+Tailwind CSS
 
-Turso database connection
+TypeScript
 
-Authentication system (users must be logged in)
+Turso database (libSQL)
 
-You must implement the following dashboard pages:
+Authentication system (login/register)
 
-Report Lost
-Report Found
-Lost Items
-Found Items
-Matches
+Your goal is to ensure that system features are accessible only to authorized users based on their role.
 
-The goal is to create modern, responsive, professional pages with clean architecture, reusable components, and excellent user experience.
+The RBAC implementation must be secure, scalable, and cleanly structured.
 
-General Requirements
+Main Objective
 
-Follow these rules strictly:
+Implement a role-based authorization system that:
 
-Use Modern UI Design
+restricts access to protected pages
 
-Use Tailwind CSS to create a modern dashboard design.
+protects API routes
 
-Use utilities such as:
+controls dashboard features
 
-rounded-xl
-shadow-md
-hover:shadow-lg
-transition
-bg-white
-border
-grid
-flex
+separates admin and user capabilities
 
-Design should look like a modern SaaS dashboard.
+prevents unauthorized actions
 
-Responsive Layout
+User Roles
 
-All pages must be fully responsive.
+The system must support two roles:
 
-Support:
+admin
+user
 
-mobile
-tablet
-laptop
-desktop
+These roles determine what features the user can access.
 
-Use Tailwind breakpoints:
+Role Description
+1. User Role
 
-sm:
-md:
-lg:
-xl:
-Dashboard Layout
+The user role represents:
 
-All pages must use the same dashboard layout.
+students
 
-Structure:
+faculty
 
-Sidebar
-Top Navbar
-Main Content
+staff members
 
-Sidebar menu:
+Users can interact with the lost-and-found system but cannot manage system administration tasks.
+
+User Permissions
+
+Users are allowed to:
+
+register an account
+
+login/logout
+
+view the welcome page
+
+access their dashboard
+
+report lost items
+
+report found items
+
+browse lost items
+
+browse found items
+
+view possible matches
+
+submit item claim requests
+
+view their claim status
+
+edit their profile
+
+Users are NOT allowed to:
+
+delete other users
+
+approve or reject claims
+
+delete reports from other users
+
+access admin dashboard
+
+manage system records
+
+2. Admin Role
+
+The admin role is for system administrators.
+
+Admins have full control over the system.
+
+Admin Permissions
+
+Admins can:
+
+access admin dashboard
+
+view system analytics
+
+view all users
+
+manage users
+
+manage lost item reports
+
+manage found item reports
+
+delete or edit reports
+
+verify item claims
+
+approve claim requests
+
+reject claim requests
+
+view match results
+
+manually confirm matches
+
+remove invalid matches
+
+Admins can also access everything that users can access.
+
+Database Implementation
+
+The users table must include a role field.
+
+Example schema:
+
+users
+-----
+id
+name
+email
+password
+role
+created_at
+
+Role values:
+
+admin
+user
+
+Default role for new registrations:
+
+user
+Authorization Middleware
+
+Implement route protection middleware.
+
+Create middleware that:
+
+Checks if the user is authenticated
+
+Checks the user role
+
+Allows or blocks access accordingly
+
+Example logic:
+
+If not authenticated → redirect to login
+
+If route requires admin
+    If user.role !== admin
+        deny access
+
+Create middleware inside:
+
+/middleware.ts
+Protected Routes
+
+Protect the following routes.
+
+User Protected Routes
+
+Users must be logged in to access:
+
+/dashboard
+/dashboard/report-lost
+/dashboard/report-found
+/dashboard/lost-items
+/dashboard/found-items
+/dashboard/matches
+/dashboard/profile
+Admin Protected Routes
+
+Only admins can access:
+
+/dashboard/admin
+/dashboard/admin/users
+/dashboard/admin/reports
+/dashboard/admin/claims
+/dashboard/admin/matches
+
+If a normal user tries to access admin routes:
+
+Show:
+
+403 Unauthorized
+
+Or redirect to dashboard.
+
+API Route Protection
+
+Protect backend API routes as well.
+
+Example API restrictions:
+
+User APIs
+
+Accessible by logged-in users:
+
+POST /api/items/report-lost
+POST /api/items/report-found
+GET /api/items/lost
+GET /api/items/found
+POST /api/claims/request
+Admin APIs
+
+Accessible only by admin:
+
+GET /api/admin/users
+DELETE /api/admin/users/:id
+GET /api/admin/reports
+POST /api/admin/claims/approve
+POST /api/admin/claims/reject
+
+Always validate role before executing API logic.
+
+Permission Utility Functions
+
+Create reusable permission utilities.
+
+Example file:
+
+/lib/auth/permissions.ts
+
+Functions:
+
+isAdmin(user)
+isUser(user)
+requireAdmin()
+requireAuth()
+
+Example usage:
+
+if (!isAdmin(user)) {
+  throw new Error("Unauthorized access")
+}
+Frontend Role Control
+
+Control UI elements based on role.
+
+Example:
+
+Hide admin features from users.
+
+Example sidebar logic:
+
+User sidebar:
 
 Dashboard
 Report Lost
@@ -77,410 +277,153 @@ Lost Items
 Found Items
 Matches
 Profile
-Logout
 
-Sidebar should be:
+Admin sidebar:
 
-collapsible on mobile
-
-fixed on desktop
-
-Page 1: Report Lost Item
-
-Route example:
-
-/dashboard/report-lost
-
-Purpose:
-
-Allow users to report a lost item.
-
-Page Layout
-
-Sections:
-
-1️⃣ Page Header
-
-Title:
-
-Report Lost Item
-
-Subtitle:
-
-Provide detailed information about the item you lost so the system can help find possible matches.
-
-2️⃣ Lost Item Form
-
-Create a modern form card.
-
-Fields:
-
-Item Name
-Category
-Color
-Brand
-Description
-Location Lost
-Date Lost
-Upload Image
-
-Example categories:
-
-Phone
-Wallet
-Bag
-ID
-Electronics
-Accessories
-Other
-Form Design
-
-Use a clean form layout.
-
-Example:
-
-grid grid-cols-1 md:grid-cols-2 gap-6
-
-Form inputs must include:
-
-labels
-
-placeholders
-
-validation messages
-
-Image Upload
-
-Allow users to upload an image.
-
-Requirements:
-
-preview image
-
-save image path in database
-
-show upload progress
-
-Submit Button
-
-Button text:
-
-Submit Lost Item Report
-
-When submitted:
-
-store item in database
-
-status = lost
-
-show success notification
-
-Page 2: Report Found Item
-
-Route:
-
-/dashboard/report-found
-
-Purpose:
-
-Allow users to report a found item.
-
-Page Layout
-
-Header:
-
-Report Found Item
-
-Subtitle:
-
-If you found an item on campus, report it here so the rightful owner can locate it.
-Form Fields
-
-Same structure as lost item form.
-
-Fields:
-
-Item Name
-Category
-Color
-Brand
-Description
-Location Found
-Date Found
-Upload Image
-
-Database status:
-
-found
-UX Improvement
-
-After submission:
-
-Display message:
-
-Thank you for reporting the found item. The system will automatically check for possible matches.
-Page 3: Lost Items Page
-
-Route:
-
-/dashboard/lost-items
-
-Purpose:
-
-Allow users to browse all reported lost items.
-
-Page Layout
-
-Header:
-
+Dashboard
+Report Lost
+Report Found
 Lost Items
+Found Items
+Matches
+Admin Panel
+Users
+Claims
+Reports
+Matches Management
+Admin Dashboard
 
-Subtitle:
+Create an admin dashboard page.
 
-Browse all items reported as lost within the campus.
-Search and Filters
+Route:
 
-Add search bar.
+/dashboard/admin
 
-Search fields:
+Admin dashboard should show:
 
-Item name
-Category
-Location
+total users
 
-Filters:
+total lost items
 
-Category
-Date
-Color
-Items Display
+total found items
 
-Display items using modern cards.
+total matches
 
-Card contents:
+pending claims
 
-Item Image
-Item Name
-Category
-Location Lost
-Date Lost
-Reported By
-
-Buttons:
-
-View Details
-Grid Layout
+Use dashboard cards.
 
 Example layout:
 
-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6
+Total Users
+Total Lost Items
+Total Found Items
+Pending Claims
+Seed Admin Account
 
-Cards should include:
+Seed an initial admin account in the database.
 
-rounded-xl
-shadow
-hover:shadow-lg
-transition
-Page 4: Found Items Page
+Create a seed script.
 
-Route:
+Example admin account:
 
-/dashboard/found-items
+Name: System Administrator
+Email: admin@sorsu.edu
+Password: admin123
+Role: admin
 
-Purpose:
+Ensure password is securely hashed.
 
-Allow users to browse items reported as found.
+Admin Credentials Documentation
 
-Header
-Found Items
+Create a file:
 
-Subtitle:
+docs/admin.md
 
-Check items that have been found around the campus.
-Item Cards
+Inside this file, include the admin login credentials.
 
-Each card must show:
+Example format:
 
-Item Image
-Item Name
-Category
-Location Found
-Date Found
-Reported By
+# Admin Login Credentials
 
-Buttons:
+Use the following account to access the admin dashboard.
 
-View Details
-Claim Item
-Claim Button Logic
+Email: admin@sorsu.edu
+Password: admin123
 
-If a user believes the item belongs to them:
+After login, navigate to:
 
-Click:
+/dashboard/admin
 
-Claim Item
+This file helps the developer quickly log in to the admin panel.
 
-This creates a claim request.
+Security Best Practices
 
-Database entry:
+Ensure the RBAC system follows security best practices:
 
-item_claims
-Page 5: Matches Page
+never trust frontend role validation
 
-Route:
+always validate role on backend
 
-/dashboard/matches
+hash passwords
 
-Purpose:
+sanitize inputs
 
-Display automatically detected matches between lost and found items.
+prevent privilege escalation
 
-Header
-Possible Matches
+avoid exposing sensitive data
 
-Subtitle:
+Code Structure
 
-These items may match based on the system's similarity detection.
-Match Card Design
+Organize authorization logic in a clean structure.
 
-Each match card should display two items side by side.
+Example folders:
 
-Left:
+/lib/auth
+    auth.ts
+    permissions.ts
+    session.ts
 
-Lost item
+/middleware
+    roleMiddleware.ts
+Error Handling
 
-Right:
+Unauthorized access should return:
 
-Found item
+403 Forbidden
 
-Card Layout
+Unauthenticated users should be redirected to:
 
-Example structure:
+/login
+Documentation
 
-Lost Item Card | Match Score | Found Item Card
-Display Information
+Create a documentation file:
 
-Lost Item:
+docs/role_based_access.md
 
-Image
-Name
-Category
-Location Lost
-Date Lost
+Explain:
 
-Found Item:
+how RBAC works
 
-Image
-Name
-Category
-Location Found
-Date Found
+role permissions
 
-Match Score:
+protected routes
 
-85% Match
-Match Explanation
-
-Show why the system matched them.
-
-Example:
-
-Matching attributes:
-✔ Same item type
-✔ Similar color
-✔ Same location
-✔ Close reporting date
-Action Buttons
-
-Buttons:
-
-View Lost Item
-View Found Item
-Submit Claim
-Matching Logic
-
-Matches should be generated using the rule-based scoring system.
-
-Attributes used:
-
-Item Type
-Color
-Brand
-Location
-Date
-
-Example scoring:
-
-Item type match = +40
-Location match = +30
-Color similarity = +15
-Brand match = +10
-Date within 7 days = +5
-
-If score ≥ 60 → create match.
-
-Store in database:
-
-item_matches
-Reusable Components
-
-Create reusable components such as:
-
-ItemCard
-MatchCard
-ItemForm
-ImageUploader
-SearchBar
-FilterDropdown
-DashboardHeader
-
-Place inside:
-
-/components
-UI Enhancements
-
-Add subtle animations:
-
-hover:scale-105
-transition
-duration-200
-
-Add loading skeletons while fetching data.
-
-Use empty state UI when no items exist.
-
-Example message:
-
-No items reported yet.
-Code Quality
-
-Ensure:
-
-clean code
-
-reusable components
-
-proper TypeScript types
-
-no duplicated logic
-
-proper error handling
+admin capabilities
 
 Final Goal
 
-The dashboard pages must feel like a professional modern web application used by a university.
+After implementation, the system must:
 
-The UI must be:
+restrict access to authorized roles
 
-modern
+protect dashboard pages
 
-responsive
+protect API endpoints
 
-user-friendly
+separate user and admin features
 
-scalable
+provide a secure and scalable RBAC system
 
-production quality
-
-The system should help users easily report items, browse items, and discover matches quickly.
+The system should follow production-level security standards and feel like a professional enterprise application.
 

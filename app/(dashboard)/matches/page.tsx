@@ -22,7 +22,7 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
 
       <div className="flex flex-wrap gap-2 mb-6">
         <Link
-          href="/matches"
+          href="/dashboard/matches"
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
             !params.status
               ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
@@ -32,7 +32,7 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
           All
         </Link>
         <Link
-          href="/matches?status=suggested"
+          href="/dashboard/matches?status=suggested"
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
             params.status === "suggested"
               ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
@@ -42,7 +42,7 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
           Suggested
         </Link>
         <Link
-          href="/matches?status=confirmed"
+          href="/dashboard/matches?status=confirmed"
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
             params.status === "confirmed"
               ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
@@ -52,7 +52,7 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
           Confirmed
         </Link>
         <Link
-          href="/matches?status=rejected"
+          href="/dashboard/matches?status=rejected"
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
             params.status === "rejected"
               ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"

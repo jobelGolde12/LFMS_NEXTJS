@@ -24,7 +24,7 @@ export default async function FoundItemsPage({ searchParams }: FoundItemsPagePro
         subtitle="Check items that have been found around the campus."
         action={(
           <Link
-            href="/report-found"
+            href="/dashboard/report-found"
             className="inline-flex items-center justify-center rounded-xl bg-emerald-50 px-4 py-2 font-medium text-emerald-600 transition-colors hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
           >
             <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

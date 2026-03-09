@@ -3,8 +3,13 @@ import { User, CreateUserInput, LoginInput } from "@/types";
 import { hashPassword, verifyPassword } from "@/lib/utils/auth";
 import { generateId } from "@/lib/utils";
 
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
 export async function createUser(input: CreateUserInput): Promise<User> {
-  const { name, email, password, role = "user" } = input;
+  const { name, password, role = "user" } = input;
+  const email = normalizeEmail(input.email);
   const hashedPassword = await hashPassword(password);
   const id = generateId();
 
@@ -24,9 +29,10 @@ export async function createUser(input: CreateUserInput): Promise<User> {
 }
 
 export async function getUserByEmail(email: string): Promise<User | null> {
+  const normalizedEmail = normalizeEmail(email);
   const result = await db.execute({
-    sql: "SELECT * FROM users WHERE email = ?",
-    args: [email],
+    sql: "SELECT * FROM users WHERE lower(trim(email)) = lower(trim(?)) LIMIT 1",
+    args: [normalizedEmail],
   });
 
   if (result.rows.length === 0) return null;
@@ -44,13 +50,25 @@ export async function getUserById(id: string): Promise<User | null> {
 }
 
 export async function authenticateUser(input: LoginInput): Promise<User | null> {
-  const user = await getUserByEmail(input.email);
+  const user = await getUserByEmail(normalizeEmail(input.email));
   if (!user) return null;
 
   const isValid = await verifyPassword(input.password, user.password);
-  if (!isValid) return null;
+  if (isValid) return user;
 
-  return user;
+  // Backward compatibility: if legacy data stored plain-text password,
+  // allow one-time login and migrate to hashed password.
+  if (input.password === user.password) {
+    const newHashedPassword = await hashPassword(input.password);
+    await db.execute({
+      sql: "UPDATE users SET password = ? WHERE id = ?",
+      args: [newHashedPassword, user.id],
+    });
+
+    return { ...user, password: newHashedPassword };
+  }
+
+  return null;
 }
 
 export async function getAllUsers(): Promise<User[]> {
@@ -73,5 +91,12 @@ export async function updateUserRole(userId: string, role: "user" | "admin"): Pr
   await db.execute({
     sql: "UPDATE users SET role = ? WHERE id = ?",
     args: [role, userId],
+  });
+}
+
+export async function deleteUser(userId: string): Promise<void> {
+  await db.execute({
+    sql: "DELETE FROM users WHERE id = ?",
+    args: [userId],
   });
 }

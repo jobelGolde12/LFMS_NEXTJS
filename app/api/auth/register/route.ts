@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createUser, getUserByEmail } from "@/lib/services/user";
+import { setSession } from "@/lib/auth/session";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +12,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, password } = body;
+    const name = String(body?.name || "").trim();
+    const email = String(body?.email || "").trim().toLowerCase();
+    const password = String(body?.password || "");
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -37,14 +40,9 @@ export async function POST(request: NextRequest) {
 
     const user = await createUser({ name, email, password });
 
-    const sessionData = JSON.stringify({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    });
+    await setSession(user);
 
-    const response = NextResponse.json({
+    return NextResponse.json({
       message: "Registration successful",
       user: {
         id: user.id,
@@ -54,15 +52,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    response.cookies.set("lfms_session", sessionData, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
-    });
-
-    return response;
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
