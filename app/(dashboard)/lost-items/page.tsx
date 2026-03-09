@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { ItemCard } from "@/components/items";
 import { getItemsByStatus } from "@/lib/services/item";
-import { CATEGORIES } from "@/types";
+import { CATEGORIES, COLORS } from "@/types";
+import { DashboardHeader, DateFilter, FilterDropdown, SearchBar } from "@/components/dashboard";
 
 interface LostItemsPageProps {
-  searchParams: Promise<{ search?: string; category?: string }>;
+  searchParams: Promise<{ search?: string; category?: string; color?: string; date?: string }>;
 }
 
 export default async function LostItemsPage({ searchParams }: LostItemsPageProps) {
@@ -12,54 +13,46 @@ export default async function LostItemsPage({ searchParams }: LostItemsPageProps
   const { items, total } = await getItemsByStatus("lost", {
     search: params.search,
     category: params.category,
+    color: params.color,
+    date: params.date,
   });
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
-            Lost Items
-          </h1>
-          <p className="text-zinc-600 dark:text-zinc-400 mt-2">
-            {total} items reported lost
-          </p>
-        </div>
-        <Link
-          href="/report-lost"
-          className="inline-flex items-center justify-center px-4 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 transition-colors font-medium"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-          Report Lost Item
-        </Link>
-      </div>
-
-      <div className="flex flex-wrap gap-2 mb-6">
-        <Link
-          href="/lost-items"
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-            !params.category
-              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-              : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-          }`}
-        >
-          All
-        </Link>
-        {CATEGORIES.map((category) => (
+      <DashboardHeader
+        title="Lost Items"
+        subtitle="Browse all items reported as lost within the campus."
+        action={(
           <Link
-            key={category}
-            href={`/lost-items?category=${category}`}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-              params.category === category
-                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-            }`}
+            href="/report-lost"
+            className="inline-flex items-center justify-center rounded-xl bg-red-50 px-4 py-2 font-medium text-red-600 transition-colors hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
           >
-            {category}
+            <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            Report Lost Item
           </Link>
-        ))}
+        )}
+      />
+
+      <div className="mb-6 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+          <SearchBar placeholder="Search by item name, category, or location..." initialValue={params.search || ""} />
+          <FilterDropdown
+            paramName="category"
+            defaultLabel="All categories"
+            value={params.category}
+            options={CATEGORIES.map((category) => ({ value: category, label: category }))}
+          />
+          <FilterDropdown
+            paramName="color"
+            defaultLabel="All colors"
+            value={params.color}
+            options={COLORS.map((color) => ({ value: color, label: color }))}
+          />
+          <DateFilter value={params.date || ""} />
+        </div>
+        <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">{total} items reported lost</p>
       </div>
 
       {items.length === 0 ? (

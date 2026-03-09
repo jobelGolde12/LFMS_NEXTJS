@@ -82,7 +82,7 @@ export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed top-16 left-0 w-64 h-screen bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 overflow-y-auto">
+    <aside className="fixed top-16 left-0 hidden h-screen w-64 overflow-y-auto border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 md:block">
       <div className="p-6">
         <div className="flex items-center space-x-3 mb-8">
           <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
@@ -102,11 +102,14 @@ export function Sidebar({ user }: SidebarProps) {
 
         <nav className="space-y-1">
           {navigation.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/dashboard" && pathname.startsWith(`${item.href}/`));
             return (
               <Link
                 key={item.name}
                 href={item.href}
+                prefetch
                 className={cn(
                   "flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200",
                   isActive
@@ -133,6 +136,7 @@ export function Sidebar({ user }: SidebarProps) {
                   <Link
                     key={item.name}
                     href={item.href}
+                    prefetch
                     className={cn(
                       "flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200",
                       isActive

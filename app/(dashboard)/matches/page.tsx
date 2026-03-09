@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MatchCard } from "@/components/items";
 import { getMatches } from "@/lib/matching-engine";
+import { DashboardHeader } from "@/components/dashboard";
 
 interface MatchesPageProps {
   searchParams: Promise<{ status?: string }>;
@@ -14,16 +15,10 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
-            Matches
-          </h1>
-          <p className="text-zinc-600 dark:text-zinc-400 mt-2">
-            {total} potential matches found
-          </p>
-        </div>
-      </div>
+      <DashboardHeader
+        title="Possible Matches"
+        subtitle="These items may match based on the system's similarity detection."
+      />
 
       <div className="flex flex-wrap gap-2 mb-6">
         <Link
@@ -67,6 +62,8 @@ export default async function MatchesPage({ searchParams }: MatchesPageProps) {
           Rejected
         </Link>
       </div>
+
+      <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">{total} potential matches found</p>
 
       {matches.length === 0 ? (
         <div className="text-center py-16">

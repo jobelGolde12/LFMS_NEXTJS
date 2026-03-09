@@ -55,6 +55,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || undefined;
     const category = searchParams.get("category") || undefined;
     const location = searchParams.get("location") || undefined;
+    const color = searchParams.get("color") || undefined;
+    const date = searchParams.get("date") || undefined;
     const limit = parseInt(searchParams.get("limit") || "20");
     const offset = parseInt(searchParams.get("offset") || "0");
     const userId = searchParams.get("userId");
@@ -65,11 +67,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (status) {
-      const result = await getItemsByStatus(status, { search, category, location, limit, offset });
+      const result = await getItemsByStatus(status, { search, category, location, color, date, limit, offset });
       return NextResponse.json(result);
     }
 
-    const result = await getAllItems({ search, category, location, limit, offset });
+    const result = await getAllItems({ search, category, location, color, date, limit, offset });
     return NextResponse.json(result);
   } catch (error) {
     console.error("Get items error:", error);

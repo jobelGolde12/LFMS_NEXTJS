@@ -5,15 +5,15 @@ import Link from "next/link";
 import { Card, Badge, CardContent } from "@/components/ui";
 import { Item } from "@/types";
 import { formatDate } from "@/lib/utils";
-import { cn } from "@/lib/utils/cn";
+import { ClaimButton } from "./claim-button";
 
 interface ItemCardProps {
   item: Item;
   showActions?: boolean;
-  onClaim?: () => void;
+  showClaimButton?: boolean;
 }
 
-export function ItemCard({ item, showActions = false, onClaim }: ItemCardProps) {
+export function ItemCard({ item, showActions = false, showClaimButton = false }: ItemCardProps) {
   const isLost = item.status === "lost";
 
   return (
@@ -122,6 +122,14 @@ export function ItemCard({ item, showActions = false, onClaim }: ItemCardProps) 
             </svg>
             <span>{formatDate(item.date_reported)}</span>
           </div>
+          {item.reporter_name && (
+            <div className="flex items-center space-x-2">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A9 9 0 1118.879 17.8M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>Reported by {item.reporter_name}</span>
+            </div>
+          )}
         </div>
 
         {showActions && (
@@ -132,13 +140,10 @@ export function ItemCard({ item, showActions = false, onClaim }: ItemCardProps) 
             >
               View Details
             </Link>
-            {!isLost && onClaim && (
-              <button
-                onClick={onClaim}
-                className="mt-2 block w-full text-center py-2 px-4 text-zinc-600 bg-zinc-50 rounded-xl hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition-colors font-medium"
-              >
-                Claim This Item
-              </button>
+            {!isLost && showClaimButton && (
+              <div className="mt-2">
+                <ClaimButton itemId={item.id} className="w-full" />
+              </div>
             )}
           </div>
         )}

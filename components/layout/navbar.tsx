@@ -17,6 +17,14 @@ export function Navbar({ user }: NavbarProps) {
 
   const isAuthPage = pathname === "/login" || pathname === "/register";
   const isDashboard = pathname.startsWith("/dashboard") || pathname.startsWith("/lost-items") || pathname.startsWith("/found-items") || pathname.startsWith("/matches") || pathname.startsWith("/claims") || pathname.startsWith("/report-");
+  const dashboardLinks = [
+    { name: "Dashboard", href: "/dashboard" },
+    { name: "Report Lost", href: "/report-lost" },
+    { name: "Report Found", href: "/report-found" },
+    { name: "Lost Items", href: "/lost-items" },
+    { name: "Found Items", href: "/found-items" },
+    { name: "Matches", href: "/matches" },
+  ];
 
   const handleLogout = async () => {
     try {
@@ -135,6 +143,19 @@ export function Navbar({ user }: NavbarProps) {
                 >
                   Logout
                 </button>
+                {isDashboard && (
+                  <div className="border-t border-zinc-200 pt-2 dark:border-zinc-800">
+                    {dashboardLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="block py-2 text-zinc-600 dark:text-zinc-300"
+                      >
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </>
             ) : (
               <>

@@ -15,6 +15,7 @@ export interface User {
 export interface Item {
   id: string;
   user_id: string;
+  reporter_name?: string;
   title: string;
   category: string;
   color?: string;

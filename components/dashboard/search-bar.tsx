@@ -1,24 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui";
 import { debounce } from "@/lib/utils";
 
 interface SearchBarProps {
   placeholder?: string;
-  onSearch?: (query: string) => void;
+  paramName?: string;
+  initialValue?: string;
 }
 
-export function SearchBar({ placeholder = "Search...", onSearch }: SearchBarProps) {
-  const [query, setQuery] = useState("");
-
-  const debouncedSearch = debounce((value: string) => {
-    onSearch?.(value);
-  }, 300);
+export function SearchBar({
+  placeholder = "Search...",
+  paramName = "search",
+  initialValue = "",
+}: SearchBarProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(initialValue);
 
   useEffect(() => {
-    debouncedSearch(query);
-  }, [query, debouncedSearch]);
+    setQuery(initialValue);
+  }, [initialValue]);
+
+  const applyQuery = useMemo(
+    () =>
+      debounce((value: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (value.trim()) {
+          params.set(paramName, value.trim());
+        } else {
+          params.delete(paramName);
+        }
+        const nextQuery = params.toString();
+        const currentQuery = searchParams.toString();
+        if (nextQuery !== currentQuery) {
+          router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname);
+        }
+      }, 300),
+    [pathname, router, searchParams, paramName]
+  );
+
+  useEffect(() => {
+    applyQuery(query);
+  }, [query, applyQuery]);
 
   return (
     <div className="relative">
@@ -30,7 +57,7 @@ export function SearchBar({ placeholder = "Search...", onSearch }: SearchBarProp
         className="pl-10"
       />
       <svg
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400"
+        className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-400"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"

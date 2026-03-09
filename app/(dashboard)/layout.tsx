@@ -19,7 +19,7 @@ export default async function DashboardLayout({
       <Navbar user={session} />
       <div className="flex">
         <Sidebar user={session} />
-        <main className="flex-1 ml-64 p-6 md:p-8 overflow-y-auto">
+        <main className="ml-0 flex-1 overflow-y-auto p-6 md:ml-64 md:p-8">
           {children}
         </main>
       </div>

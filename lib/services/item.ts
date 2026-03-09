@@ -52,7 +52,10 @@ export async function createItem(userId: string, input: CreateItemInput): Promis
 
 export async function getItemById(id: string): Promise<Item | null> {
   const result = await db.execute({
-    sql: "SELECT * FROM items WHERE id = ?",
+    sql: `SELECT items.*, users.name as reporter_name
+          FROM items
+          LEFT JOIN users ON users.id = items.user_id
+          WHERE items.id = ?`,
     args: [id],
   });
 
@@ -66,19 +69,21 @@ export async function getItemsByStatus(
     search?: string;
     category?: string;
     location?: string;
+    color?: string;
+    date?: string;
     limit?: number;
     offset?: number;
   }
 ): Promise<{ items: Item[]; total: number }> {
-  const { search, category, location, limit = 20, offset = 0 } = options || {};
+  const { search, category, location, color, date, limit = 20, offset = 0 } = options || {};
 
   let whereClause = "WHERE status = ?";
   const params: (string | number)[] = [status];
 
   if (search) {
-    whereClause += ` AND (title LIKE ? OR description LIKE ? OR location LIKE ?)`;
+    whereClause += ` AND (title LIKE ? OR description LIKE ? OR location LIKE ? OR category LIKE ?)`;
     const searchTerm = `%${search}%`;
-    params.push(searchTerm, searchTerm, searchTerm);
+    params.push(searchTerm, searchTerm, searchTerm, searchTerm);
   }
 
   if (category) {
@@ -90,6 +95,14 @@ export async function getItemsByStatus(
     whereClause += " AND location = ?";
     params.push(location);
   }
+  if (color) {
+    whereClause += " AND color = ?";
+    params.push(color);
+  }
+  if (date) {
+    whereClause += " AND date_reported = ?";
+    params.push(date);
+  }
 
   const countResult = await db.execute({
     sql: `SELECT COUNT(*) as count FROM items ${whereClause}`,
@@ -97,7 +110,12 @@ export async function getItemsByStatus(
   });
 
   const itemsResult = await db.execute({
-    sql: `SELECT * FROM items ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    sql: `SELECT items.*, users.name as reporter_name
+          FROM items
+          LEFT JOIN users ON users.id = items.user_id
+          ${whereClause}
+          ORDER BY items.created_at DESC
+          LIMIT ? OFFSET ?`,
     args: [...params, limit, offset],
   });
 
@@ -111,11 +129,13 @@ export async function getAllItems(options?: {
   search?: string;
   category?: string;
   location?: string;
+  color?: string;
+  date?: string;
   status?: ItemStatus;
   limit?: number;
   offset?: number;
 }): Promise<{ items: Item[]; total: number }> {
-  const { search, category, location, status, limit = 20, offset = 0 } = options || {};
+  const { search, category, location, color, date, status, limit = 20, offset = 0 } = options || {};
 
   let whereClause = "WHERE 1=1";
   const params: (string | number)[] = [];
@@ -126,9 +146,9 @@ export async function getAllItems(options?: {
   }
 
   if (search) {
-    whereClause += ` AND (title LIKE ? OR description LIKE ? OR location LIKE ?)`;
+    whereClause += ` AND (title LIKE ? OR description LIKE ? OR location LIKE ? OR category LIKE ?)`;
     const searchTerm = `%${search}%`;
-    params.push(searchTerm, searchTerm, searchTerm);
+    params.push(searchTerm, searchTerm, searchTerm, searchTerm);
   }
 
   if (category) {
@@ -140,6 +160,14 @@ export async function getAllItems(options?: {
     whereClause += " AND location = ?";
     params.push(location);
   }
+  if (color) {
+    whereClause += " AND color = ?";
+    params.push(color);
+  }
+  if (date) {
+    whereClause += " AND date_reported = ?";
+    params.push(date);
+  }
 
   const countResult = await db.execute({
     sql: `SELECT COUNT(*) as count FROM items ${whereClause}`,
@@ -147,7 +175,12 @@ export async function getAllItems(options?: {
   });
 
   const itemsResult = await db.execute({
-    sql: `SELECT * FROM items ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    sql: `SELECT items.*, users.name as reporter_name
+          FROM items
+          LEFT JOIN users ON users.id = items.user_id
+          ${whereClause}
+          ORDER BY items.created_at DESC
+          LIMIT ? OFFSET ?`,
     args: [...params, limit, offset],
   });
 
