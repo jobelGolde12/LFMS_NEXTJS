@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createItem, getItemsByStatus, getAllItems, getItemsByUserId } from "@/lib/services/item";
 import { requireAuth } from "@/lib/auth/permissions";
+import { runMatchingForItem } from "@/lib/matching-engine";
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,6 +34,10 @@ export async function POST(request: NextRequest) {
       status,
       date_reported,
       image_url,
+    });
+
+    await runMatchingForItem(item).catch((error) => {
+      console.error("Matching trigger error:", error);
     });
 
     return NextResponse.json({ message: "Item created successfully", item });

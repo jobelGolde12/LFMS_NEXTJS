@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/permissions";
 import { createItem } from "@/lib/services/item";
+import { runMatchingForItem } from "@/lib/matching-engine";
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,6 +27,10 @@ export async function POST(request: NextRequest) {
       brand: body?.brand,
       description: body?.description,
       image_url: body?.image_url,
+    });
+
+    await runMatchingForItem(item).catch((error) => {
+      console.error("Lost item matching trigger error:", error);
     });
 
     return NextResponse.json({ item, message: "Lost item reported" }, { status: 201 });
