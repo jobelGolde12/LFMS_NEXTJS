@@ -1,13 +1,23 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { MatchCard } from "@/components/items";
 import { getMatches } from "@/lib/matching-engine";
 import { DashboardHeader } from "@/components/dashboard";
+import { getSession } from "@/lib/utils/session";
 
 interface MatchesPageProps {
   searchParams: Promise<{ status?: string }>;
 }
 
 export default async function MatchesPage({ searchParams }: MatchesPageProps) {
+  const session = await getSession();
+  if (!session) {
+    redirect("/login");
+  }
+  if (session.role !== "admin") {
+    redirect("/dashboard");
+  }
+
   const params = await searchParams;
   const { matches, total } = await getMatches({
     status: params.status,

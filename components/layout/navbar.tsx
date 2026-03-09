@@ -32,7 +32,7 @@ export function Navbar({ user }: NavbarProps) {
     { name: "Found Items", href: "/dashboard/found-items" },
     { name: "Matches", href: "/dashboard/matches" },
     { name: "Profile", href: "/dashboard/profile" },
-  ];
+  ].filter((link) => (user?.role === "admin" ? true : link.href !== "/dashboard/matches"));
 
   const handleLogout = async () => {
     try {

@@ -126,6 +126,10 @@ const adminNavigation = [
 export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const navItems =
+    user.role === "admin"
+      ? navigation
+      : navigation.filter((item) => item.href !== "/dashboard/matches");
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -153,7 +157,7 @@ export function Sidebar({ user }: SidebarProps) {
         </div>
 
         <nav className="space-y-1">
-          {navigation.map((item) => {
+          {navItems.map((item) => {
             const isActive =
               pathname === item.href ||
               (item.href !== "/dashboard" && pathname.startsWith(`${item.href}/`));
