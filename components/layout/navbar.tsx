@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui";
 import { User } from "@/types";
 
@@ -16,6 +16,7 @@ export function Navbar({ user }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isDashboard = pathname.startsWith("/dashboard") || pathname.startsWith("/lost-items") || pathname.startsWith("/found-items") || pathname.startsWith("/matches") || pathname.startsWith("/claims") || pathname.startsWith("/report-");
 
   const handleLogout = async () => {
     try {
@@ -56,53 +57,19 @@ export function Navbar({ user }: NavbarProps) {
 
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="text-zinc-600 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400 transition-colors"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/lost-items"
-                  className="text-zinc-600 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400 transition-colors"
-                >
-                  Lost Items
-                </Link>
-                <Link
-                  href="/found-items"
-                  className="text-zinc-600 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400 transition-colors"
-                >
-                  Found Items
-                </Link>
-                <Link
-                  href="/matches"
-                  className="text-zinc-600 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400 transition-colors"
-                >
-                  Matches
-                </Link>
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                  {user.name}
+                </span>
                 {user.role === "admin" && (
-                  <Link
-                    href="/claims"
-                    className="text-zinc-600 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400 transition-colors"
-                  >
-                    Claims
-                  </Link>
-                )}
-                <div className="flex items-center space-x-3 ml-4">
-                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {user.name}
+                  <span className="px-2 py-0.5 text-xs bg-emerald-100 text-emerald-700 rounded-full">
+                    Admin
                   </span>
-                  {user.role === "admin" && (
-                    <span className="px-2 py-0.5 text-xs bg-emerald-100 text-emerald-700 rounded-full">
-                      Admin
-                    </span>
-                  )}
-                  <Button variant="outline" size="sm" onClick={handleLogout}>
-                    Logout
-                  </Button>
-                </div>
-              </>
+                )}
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </div>
             ) : (
               <>
                 <Link href="/login">
@@ -154,30 +121,14 @@ export function Navbar({ user }: NavbarProps) {
           <div className="px-4 py-3 space-y-2">
             {user ? (
               <>
-                <Link
-                  href="/dashboard"
-                  className="block py-2 text-zinc-600 dark:text-zinc-300"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/lost-items"
-                  className="block py-2 text-zinc-600 dark:text-zinc-300"
-                >
-                  Lost Items
-                </Link>
-                <Link
-                  href="/found-items"
-                  className="block py-2 text-zinc-600 dark:text-zinc-300"
-                >
-                  Found Items
-                </Link>
-                <Link
-                  href="/matches"
-                  className="block py-2 text-zinc-600 dark:text-zinc-300"
-                >
-                  Matches
-                </Link>
+                <div className="py-2 text-zinc-600 dark:text-zinc-300">
+                  {user.name}
+                  {user.role === "admin" && (
+                    <span className="ml-2 px-2 py-0.5 text-xs bg-emerald-100 text-emerald-700 rounded-full">
+                      Admin
+                    </span>
+                  )}
+                </div>
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left py-2 text-red-600"
